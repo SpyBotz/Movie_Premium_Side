@@ -434,9 +434,9 @@ border-radius: 10px;
 display: inline-block;
 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.qr-container img {
-width: 140px;
-height: 140px;
+.qr-container img, .qr-container canvas {
+width: 130px;
+height: 130px;
 object-fit: contain;
 display: block;
 margin: 0 auto;
@@ -564,7 +564,7 @@ margin: 0 auto;
 <div id="qrcode"></div>
 </div>
 
-<!-- QR Download Button Added -->
+<!-- QR Download Button -->
 <a id="downloadQrBtn" href="javascript:void(0)" onclick="downloadQRCode()" class="app-btn download-qr-btn">
 ⬇️ Download QR Code
 </a>
@@ -581,7 +581,7 @@ margin: 0 auto;
 <img src="https://iili.io/CLEyDvI.jpg" class="app-logo"> Paytm Direct
 </a>
 
-<!-- Amazon Pay Button Added -->
+<!-- Amazon Pay Button -->
 <a href="javascript:void(0)" onclick="payVia('amazon')" class="app-btn amazon">
 <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg" class="app-logo"> Amazon Pay Direct
 </a>
@@ -654,19 +654,29 @@ confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
 
 function closePaymentModal(){ document.getElementById("paymentModal").style.display = "none"; }
 
-// Function to Download QR Code
+// Fixed Function to Properly Download QR Code as Image
 function downloadQRCode(){
-  let qrImg = document.querySelector("#qrcode img");
-  if(qrImg){
-    let imgSrc = qrImg.src;
+  let canvas = document.querySelector("#qrcode canvas");
+  if(canvas){
+    let imageUrl = canvas.toDataURL("image/png");
     let downloadLink = document.createElement("a");
-    downloadLink.href = imgSrc;
+    downloadLink.href = imageUrl;
     downloadLink.download = "UPI_QR_Code.png";
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
   } else {
-    alert("QR Code is generating, please wait a second!");
+    let qrImg = document.querySelector("#qrcode img");
+    if(qrImg && qrImg.src){
+      let downloadLink = document.createElement("a");
+      downloadLink.href = qrImg.src;
+      downloadLink.download = "UPI_QR_Code.png";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    } else {
+      alert("QR Code is generating, please wait a second!");
+    }
   }
 }
 
@@ -706,8 +716,8 @@ let buyers = [
   { name: "@Vikas_Kumar", plan: "2 Months" },
   { name: "@Javed", plan: "1 Month" },
   { name: "@Rime", plan: "1 Month" },
-  { name: "@Simran", plan: "1 Week" },
-  { name: "@Deep_sing", plan: "1 Week" }
+  { name: "@Simran", plan: "2 Day" },
+  { name: "@Deep_sing", plan: "2 Day" }
 ];
 let bIndex = 0;
 setInterval(function(){
