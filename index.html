@@ -192,20 +192,6 @@ background:#7289da;
 background:#ff5722;
 }
 
-/* Spin Wheel Trigger Button */
-.spin-trigger-btn {
-background: linear-gradient(45deg, #f39c12, #d35400);
-font-size: 13px;
-padding: 8px;
-margin-bottom: 10px;
-border-radius: 8px;
-animation: bounceBtn 2s infinite;
-}
-@keyframes bounceBtn {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
 /* Movie Catalog Button Styling */
 .catalog-btn {
 background: linear-gradient(45deg, #8e44ad, #3498db);
@@ -394,6 +380,8 @@ padding: 20px;
 border-radius: 16px;
 text-align: center;
 box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+max-height: 90vh;
+overflow-y: auto;
 }
 .modal-content h3 {
 margin-top: 0;
@@ -406,7 +394,7 @@ justify-content: flex-start;
 gap: 15px;
 width: 100%;
 padding: 10px 15px;
-margin: 8px 0;
+margin: 6px 0;
 font-size: 14px;
 font-weight: bold;
 border: none;
@@ -428,6 +416,7 @@ padding: 2px;
 .phonepe { background: #5f259f; }
 .paytm { background: #00b9f1; }
 .amazon { background: #ff9900; color: #111; }
+.download-qr-btn { background: #8e44ad; color: white; justify-content: center; text-align: center; }
 .close-btn {
 background: #ccc;
 color: #333;
@@ -451,30 +440,6 @@ height: 140px;
 object-fit: contain;
 display: block;
 margin: 0 auto;
-}
-
-/* Spin Wheel Modal Styling */
-.wheel-container {
-position: relative;
-width: 200px;
-height: 200px;
-margin: 15px auto;
-border-radius: 50%;
-border: 5px solid #ff9900;
-background: conic-gradient(#ff416c 0deg 90deg, #ff9900 90deg 180deg, #2ecc71 180deg 270deg, #3498db 270deg 360deg);
-transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-}
-.wheel-pointer {
-position: absolute;
-top: -15px;
-left: 50%;
-transform: translateX(-50%);
-width: 0;
-height: 0;
-border-left: 10px solid transparent;
-border-right: 10px solid transparent;
-border-bottom: 20px solid #e74c3c;
-z-index: 10;
 }
 </style>
 </head>
@@ -507,9 +472,9 @@ z-index: 10;
 👀 <span id="viewCount">42</span> people viewing this page right now
 </div>
 
-<!-- PoM PoM Updates Ticker -->
+<!-- Ticker -->
 <div class="movie-update-ticker" id="movieTicker">
-🫂𝑪𝒉𝒆𝒄𝒌𝒊𝒏𝒈 𝒇𝒐𝒓 𝒏𝒆𝒘 𝑷𝒓𝒆𝒎𝒊𝒖𝒎 𝑴𝒆𝒎𝒃𝒆𝒓 𝒖𝒑𝒅𝒂𝒕𝒆𝒔...👇👇
+🫂𝑪𝒉𝒆𝒄𝒌𝒊𝒏𝒈 𝒇𝒐𝒓 𝒏𝒆𝓴 𝑷𝒓𝒆𝒎𝒊𝒖𝒎 𝑴𝒆𝒎𝒃𝒆𝒓 𝒖𝒑𝒅𝒂𝒕𝒆𝒔...👇👇
 </div>
 
 <div class="buyer-ticker" id="buyerTicker">
@@ -558,7 +523,7 @@ z-index: 10;
 
 <button class="telegram" onclick="playClickSound(); winnerScreenshot()">👤 𝑷𝒂𝒚𝒎𝒆𝒏𝒕 𝑺𝒄𝒓𝒆𝒆𝒏𝒔𝒉𝒐𝒕</button>
 <button class="channel-btn" onclick="playClickSound(); openMainChannel()">📢 𝑷𝒓𝒆𝒎𝒊𝒖𝒎 𝑪𝒉𝒂𝒏𝒏𝒆𝒍 𝒋𝒐𝒊𝒏 🍿</button>
-<button class="channel" onclick="playClickSound(); openMainChannel()">💳𝑷𝒂𝒚𝒎𝒆𝒏𝒕 𝑷𝒓𝒐𝒇𝒇💳</button>
+<button class="channel" onclick="playClickSound(); paymentproof()">💳𝑷𝒂𝒚𝒎𝒆𝒏𝒕 𝑷𝒓𝒐𝒇𝒇💳</button>
 
 <div class="faq-section">
 <div class="faq-title">❓ Frequently Asked Questions</div>
@@ -589,7 +554,7 @@ z-index: 10;
 <!-- Toast Notification -->
 <div id="toast" class="toast">✅ Copied Successfully!</div>
 
-<!-- Payment Modal with QR Code (Download button removed) -->
+<!-- Payment Modal with QR Code and Download Button -->
 <div id="paymentModal" class="modal">
 <div class="modal-content">
 <h3>Scan QR or Pay via App</h3>
@@ -598,6 +563,11 @@ z-index: 10;
 <div class="qr-container">
 <div id="qrcode"></div>
 </div>
+
+<!-- QR Download Button Added -->
+<a id="downloadQrBtn" href="javascript:void(0)" onclick="downloadQRCode()" class="app-btn download-qr-btn">
+⬇️ Download QR Code
+</a>
 
 <a href="javascript:void(0)" onclick="payVia('gpay')" class="app-btn gpay">
 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" class="app-logo"> Google Pay Direct
@@ -609,6 +579,11 @@ z-index: 10;
 
 <a href="javascript:void(0)" onclick="payVia('paytm')" class="app-btn paytm">
 <img src="https://iili.io/CLEyDvI.jpg" class="app-logo"> Paytm Direct
+</a>
+
+<!-- Amazon Pay Button Added -->
+<a href="javascript:void(0)" onclick="payVia('amazon')" class="app-btn amazon">
+<img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg" class="app-logo"> Amazon Pay Direct
 </a>
 
 <button class="app-btn close-btn" onclick="closePaymentModal()">Cancel</button>
@@ -679,16 +654,20 @@ confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
 
 function closePaymentModal(){ document.getElementById("paymentModal").style.display = "none"; }
 
-function openSpinModal(){ document.getElementById("spinModal").style.display = "flex"; document.getElementById("spinResult").innerText = ""; }
-function closeSpinModal(){ document.getElementById("spinModal").style.display = "none"; }
-function spinWheel(){
-  let wheel = document.getElementById("wheel");
-  let randomDegree = Math.floor(Math.random() * 3600) + 1440;
-  wheel.style.transform = `rotate(${randomDegree}deg)`;
-  setTimeout(() => {
-    document.getElementById("spinResult").innerText = "🎉 Mubarak ho! Aapko Special Discount Mil Gaya!";
-    confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 } });
-  }, 4000);
+// Function to Download QR Code
+function downloadQRCode(){
+  let qrImg = document.querySelector("#qrcode img");
+  if(qrImg){
+    let imgSrc = qrImg.src;
+    let downloadLink = document.createElement("a");
+    downloadLink.href = imgSrc;
+    downloadLink.download = "UPI_QR_Code.png";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  } else {
+    alert("QR Code is generating, please wait a second!");
+  }
 }
 
 function payVia(appType){
@@ -698,7 +677,8 @@ let am = selectedAmount;
 let finalUrl = "";
 if(appType === 'gpay'){ finalUrl = "tez://upi/pay?pa=" + pa + "&pn=" + pn + "&am=" + am + "&cu=INR"; }
 else if(appType === 'phonepe'){ finalUrl = "phonepe://pay?pa=" + pa + "&pn=" + pn + "&am=" + am + "&cu=INR"; }
-else { finalUrl = "paytmmp://pay?pa=" + pa + "&pn=" + pn + "&am=" + am + "&cu=INR"; }
+else if(appType === 'paytm'){ finalUrl = "paytmmp://pay?pa=" + pa + "&pn=" + pn + "&am=" + am + "&cu=INR"; }
+else if(appType === 'amazon'){ finalUrl = "https://www.amazon.in/h5/pay?pa=" + pa + "&pn=" + pn + "&am=" + am + "&cu=INR"; }
 window.location.href = finalUrl;
 closePaymentModal();
 }
@@ -718,32 +698,6 @@ setInterval(function(){
   document.getElementById("timer").innerText = minutes + ":" + seconds;
   if(time > 0) time--;
 }, 1000);
-
-let movieUpdates = [];
-let movieIndex = 0;
-async function fetchMovieUpdates() {
-  try {
-    let response = await fetch('movies.json');
-    let data = await response.json();
-    if(data && data.latest_updates) {
-      movieUpdates = data.latest_updates;
-      updateMovieTicker();
-    }
-  } catch(e) {
-    document.getElementById("Ticker").innerHTML = "🎬 🔥 Latest  Added Daily!";
-  }
-}
-
-function updateMovieTicker() {
-  if(movieUpdates.length > 0) {
-    let ticker = document.getElementById("movieTicker");
-    ticker.innerHTML = `${Updates[Index]}`;
-    movieIndex = (movieIndex + 1) % Updates.length;
-  }
-}
-
-fetchMovieUpdates();
-setInterval(updateMovieTicker, 4500);
 
 let buyers = [
   { name: "@Rahul", plan: "1 Month" },
