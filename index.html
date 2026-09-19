@@ -434,7 +434,7 @@ border-radius: 10px;
 display: inline-block;
 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.qr-container img, .qr-container canvas {
+.qr-container img {
 width: 130px;
 height: 130px;
 object-fit: contain;
@@ -474,7 +474,7 @@ margin: 0 auto;
 
 <!-- Ticker -->
 <div class="movie-update-ticker" id="movieTicker">
-🫂𝑪𝒉𝒆𝒄𝒌𝒊𝒏𝒈 𝒇𝒐𝒓 𝒏𝒆𝓴 𝑷𝒓𝒆𝒎𝒊𝒖𝒎 𝑴𝒆𝒎𝒃𝒆𝒓 𝒖𝒑𝒅𝒂𝒕𝒆𝒔...👇👇
+🫂𝑪𝒉𝒆𝒄𝒌𝒊𝒏𝒈 𝒇𝒐𝒓 𝒏𝒆𝓴 𝑷𝒓𝒆𝒎𝒊𝒖𝒎 𝑴𝒆𝒎𝒃𝒆𝚛 𝒖𝒑𝒅𝒂𝒕𝒆𝒔...👇👇
 </div>
 
 <div class="buyer-ticker" id="buyerTicker">
@@ -530,7 +530,7 @@ margin: 0 auto;
 
 <div class="faq-item">
 <div class="faq-question" onclick="toggleFaq(this)">Payment ke baad membership kab milegi? <span>▼</span></div>
-<div class="faq-answer">Payment ka screenshot owner ko bhejne ke baad turant aapko private Channel ka access mil jayega.</div>
+<div class="faq-answer">Payment ka screenshot owner ko bhejne ke baad turant aapko private group ka access mil jayega.</div>
 </div>
 
 <div class="faq-item">
@@ -554,14 +554,15 @@ margin: 0 auto;
 <!-- Toast Notification -->
 <div id="toast" class="toast">✅ Copied Successfully!</div>
 
-<!-- Payment Modal with QR Code and Download Button -->
+<!-- Payment Modal with Static QR Image and Download Button -->
 <div id="paymentModal" class="modal">
 <div class="modal-content">
 <h3>Scan QR or Pay via App</h3>
 <p id="modalAmount" style="color:var(--text-color); font-weight:bold; margin-bottom:8px;"></p>
 
 <div class="qr-container">
-<div id="qrcode"></div>
+<!-- Yahan 'qr.png' aapki custom QR image ka path hai -->
+<img id="customQrImg" src="qr.png" alt="UPI QR Code">
 </div>
 
 <!-- QR Download Button -->
@@ -590,15 +591,11 @@ margin: 0 auto;
 </div>
 </div>
 
-<!-- Include QRCode JS Library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
 <script>
 let selectedAmount = 0;
 let selectedDuration = "";
 let plansData = { "1week": "1 Week", "1month": "1 Month", "2month": "2 Month", "3month": "3 Month" };
 let upiId = "BHARATPE.9Q0Q0K0Z8Q466572@unitype";
-let qrCodeInstance = null;
 
 function toggleTheme(){
   let body = document.body;
@@ -645,38 +642,23 @@ function openPaymentModal(){
 if(selectedAmount === 0){ alert("Please select a membership plan first!"); return; }
 document.getElementById("modalAmount").innerHTML = "Amount: ₹" + selectedAmount + " (" + selectedDuration + ")";
 document.getElementById("paymentModal").style.display = "flex";
-let qrContainer = document.getElementById("qrcode");
-qrContainer.innerHTML = "";
-let upiString = `upi://pay?pa=${upiId}&pn=Sekh%20Sarif&am=${selectedAmount}&cu=INR`;
-qrCodeInstance = new QRCode(qrContainer, { text: upiString, width: 130, height: 130 });
 confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
 }
 
 function closePaymentModal(){ document.getElementById("paymentModal").style.display = "none"; }
 
-// Fixed Function to Properly Download QR Code as Image
+// Function to Download Custom QR Image Directly
 function downloadQRCode(){
-  let canvas = document.querySelector("#qrcode canvas");
-  if(canvas){
-    let imageUrl = canvas.toDataURL("image/png");
+  let qrImg = document.getElementById("customQrImg");
+  if(qrImg && qrImg.src){
     let downloadLink = document.createElement("a");
-    downloadLink.href = imageUrl;
+    downloadLink.href = qrImg.src;
     downloadLink.download = "UPI_QR_Code.png";
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
   } else {
-    let qrImg = document.querySelector("#qrcode img");
-    if(qrImg && qrImg.src){
-      let downloadLink = document.createElement("a");
-      downloadLink.href = qrImg.src;
-      downloadLink.download = "UPI_QR_Code.png";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-    } else {
-      alert("QR Code is generating, please wait a second!");
-    }
+    alert("QR Image not found!");
   }
 }
 
